@@ -4,12 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     EditText et;
     Button btnSave, btnLoad;
@@ -24,24 +27,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         et = (EditText) findViewById(R.id.editText);
         btnSave = (Button) findViewById(R.id.buttonsave);
         btnLoad = (Button) findViewById(R.id.buttonload);
+        loadText();
 
-        btnSave.setOnClickListener(this);
-        btnLoad.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.buttonsave:
+        et.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 saveText();
-                break;
-            case R.id.buttonload:
-                loadText();
-                break;
-            default:
-                break;
-        }
-
+                Log.d(SAVED_TEXT, et.getText().toString());
+                return true;
+            }
+        });
     }
 
     private void saveText() {
@@ -57,5 +52,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String savedText = sharedPreferences.getString(SAVED_TEXT, "Nothing to save");
         et.setText(savedText);
         Toast.makeText(this, "Text loaded", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        saveText();
     }
 }
